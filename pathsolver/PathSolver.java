@@ -1,8 +1,11 @@
 package pathsolver;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.Stack;
 
 public class PathSolver {
 
@@ -88,20 +91,99 @@ public class PathSolver {
 
             for (int iter1 = 0; iter1 < 4; iter1++) {
                 if (canMoveToNode(leastNode.nodePt1 + horizontalIdx[iter1], leastNode.nodePt2 + verticalIdx[iter1])) {
-                    if(horizontalIdx[iter1]==-1)
-                        path+="u";
-                    else if(horizontalIdx[iter1]==1)
-                        path+="d";
-                    else if(verticalIdx[iter1]==-1)
-                        path+="l";
-                    else if(verticalIdx[iter1]==1)
-                        path+="r";
+                    if (horizontalIdx[iter1] == -1) {
+                        path += "u";
+                    } else if (horizontalIdx[iter1] == 1) {
+                        path += "d";
+                    } else if (verticalIdx[iter1] == -1) {
+                        path += "l";
+                    } else if (verticalIdx[iter1] == 1) {
+                        path += "r";
+                    }
                     PathNode child = new PathNode(leastNode.nodesSet, leastNode.nodePt1, leastNode.nodePt2, leastNode.nodePt1 + horizontalIdx[iter1], leastNode.nodePt2 + verticalIdx[iter1], leastNode.level + 1, leastNode);
                     child.cost = findEffortOfNode(child.nodesSet, endingNodes);
                     nodeIdxr.add(child);
                 }
             }
         }
+    }
+
+    private int moves = 0;
+    private SearchNode finalNode;
+    private Stack<Board> boards;
+
+    public PathSolver(Board initial) {
+        if (initial!=null) {
+            if (!initial.isSolvable()) {
+                throw new IllegalArgumentException("Unsolvable puzzle");
+            }
+            PriorityQueue<SearchNode> minPQ = new PriorityQueue<SearchNode>(initial.size() + 10);
+
+            Set<Board> previouses = new HashSet<Board>(50);
+            Board dequeuedBoard = initial;
+            Board previous = null;
+            SearchNode dequeuedNode = new SearchNode(initial, 0, null);
+            Iterable<Board> boards;
+
+            while (!dequeuedBoard.isGoal()) {
+                boards = dequeuedBoard.neighbors();
+                moves++;
+
+                for (Board board : boards) {
+                    if (!board.equals(previous) && !previouses.contains(board)) {
+                        minPQ.add(new SearchNode(board, moves, dequeuedNode));
+                    }
+                }
+
+                previouses.add(previous);
+                previous = dequeuedBoard;
+                dequeuedNode = minPQ.poll();
+                dequeuedBoard = dequeuedNode.current;
+            }
+            finalNode = dequeuedNode;
+        }
+    }
+
+// min number of moves to solve initial board
+    public int moves() {
+        if (boards != null) {
+            return boards.size() - 1;
+        }
+        solution();
+        return boards.size() - 1;
+    }
+
+    public Iterable<Board> solution() {
+        if (boards != null) {
+            return boards;
+        }
+        boards = new Stack<Board>();
+        SearchNode pointer = finalNode;
+        while (pointer != null) {
+            boards.push(pointer.current);
+            pointer = pointer.previous;
+        }
+        return boards;
+    }
+
+    private class SearchNode implements Comparable<SearchNode> {
+
+        private final int priority;
+        private final SearchNode previous;
+        private final Board current;
+
+        public SearchNode(Board current, int moves, SearchNode previous) {
+            this.current = current;
+            this.previous = previous;
+            this.priority = moves + current.manhattan();
+        }
+
+        @Override
+        public int compareTo(SearchNode that) {
+            int cmp = this.priority - that.priority;
+            return Integer.compare(cmp, 0);
+        }
+
     }
 
     public static void main(String[] args) {
@@ -112,9 +194,9 @@ public class PathSolver {
         int iter2 = 0;
         for (int iter1 = 0; iter1 < input.length(); iter1++) {
             starterNodes[iter2][iter1 % 3] = Integer.parseInt(String.valueOf(input.charAt(iter1)));
-            if(starterNodes[iter2][iter1%3]==0){
-                nodePt1=iter2;
-                nodePt2=iter1%3;
+            if (starterNodes[iter2][iter1 % 3] == 0) {
+                nodePt1 = iter2;
+                nodePt2 = iter1 % 3;
             }
             if (iter1 == 2 || iter1 == 5) {
                 iter2++;
@@ -127,16 +209,26 @@ public class PathSolver {
             System.out.println();
         }
 
-        PathSolver puzzle = new PathSolver();
+        PathSolver puzzle = new PathSolver(null);
         if (puzzle.canGetNodeResult(starterNodes)) {
             puzzle.solve(starterNodes, endingNodes, nodePt1, nodePt2);
-            System.out.println("Test: "+input);
+            System.out.println("Test: " + input);
             System.out.println("Goal: 123456780");
-            System.out.println("nodes expanded: "+puzzle.nodesCount);
+            System.out.println("nodes expanded: " + puzzle.nodesCount);
             System.out.println(puzzle.path);
         } else {
             System.out.println("The given starterNodes is impossible to solve");
         }
+
+        System.out.println("A * solution");
+        int[][] tiles = {{4, 1, 3},
+        {0, 2, 6},
+        {7, 5, 8}};
+
+        double start = System.currentTimeMillis();
+        Board board = new Board(tiles);
+        PathSolver solve = new PathSolver(board);
+        System.out.printf("nodes expanded: %d\n total nodes: %d\n  time: %f\n, ", solve.moves(), solve.moves, (System.currentTimeMillis() - start) / 1000);
     }
 
 }
