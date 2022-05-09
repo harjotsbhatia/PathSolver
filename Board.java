@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
+//this class defines a 2D board
+//that stores the state of 2D board using ints
+//it also takes total count N
 public final class Board {
 
     private final int[][] tilesCopy;
@@ -14,6 +17,7 @@ public final class Board {
     private int zeroCol = -1;
     private Collection<Board> neighbors;
 
+    //constructor
     public Board(int[][] tiles) {
         this.N = 3;
         this.tilesCopy = new int[N][N];
@@ -31,6 +35,7 @@ public final class Board {
         checkRep();
     }
 
+    //returns a value on given index
     public int tileAt(int row, int col) {
         if (row < 0 || row > N - 1) {
             throw new IndexOutOfBoundsException("row should be between 0 and N - 1");
@@ -42,10 +47,14 @@ public final class Board {
         return tilesCopy[row][col];
     }
 
+    //retrns total size
     public int size() {
         return N;
     }
 
+    //loops through all the grid and
+    //if tile at is treturnd correct then it counts hamming increment
+    //returns total hamming
     public int hamming() {
         int hamming = 0;
         for (int row = 0; row < this.size(); row++) {
@@ -58,6 +67,7 @@ public final class Board {
         return hamming;
     }
 
+    //same case for manhattan
     public int manhattan() {
         int manhattan = 0;
 
@@ -74,6 +84,7 @@ public final class Board {
         return manhattan;
     }
 
+    //check if this is a goal
     public boolean isGoal() {
         if (tileAt(N - 1, N - 1) != 0) {
             return false;
@@ -88,6 +99,7 @@ public final class Board {
         return true;
     }
 
+    //check if ths solution is really possible before going to solve
     public boolean isSolvable() {
         int inversions = 0;
 
@@ -120,6 +132,7 @@ public final class Board {
         return true;
     }
 
+    //overrided method to check if a given item on a board time is same as other board tile
     @Override
     public boolean equals(Object y) {
         if (!(y instanceof Board)) {
@@ -128,7 +141,9 @@ public final class Board {
         Board that = (Board) y;
         return this.tileAt(N - 1, N - 1) == that.tileAt(N - 1, N - 1) && this.size() == that.size() && Arrays.deepEquals(this.tilesCopy, that.tilesCopy);
     }
-
+    
+    
+    //calculates the hash code to store item on an index
     @Override
     public int hashCode() {
         if (this.hashCode != -1) {
@@ -137,7 +152,9 @@ public final class Board {
         this.hashCode = Arrays.deepHashCode(tilesCopy);
         return this.hashCode;
     }
-
+    
+    //find total neighbors available in list
+    //return total collection set
     public Collection<Board> neighbors() {
         if (neighbors != null) {
             return neighbors;
@@ -164,6 +181,7 @@ public final class Board {
         return neighbors;
     }
 
+    //find a tile where value is zero
     private void findZeroTile() {
         outerloop:
         for (int i = 0; i < this.size(); i++) {
@@ -177,6 +195,7 @@ public final class Board {
         }
     }
 
+    //make a neightbor tile
     private void generateNeighbor(int toPosition, boolean isRow) {
         Board board = new Board(this.tilesCopy);
         if (isRow) {
@@ -188,6 +207,7 @@ public final class Board {
         neighbors.add(board);
     }
 
+    //change two tiles entries
     private void swapEntries(int[][] array, int fromRow, int fromCol, int toRow, int toCol) {
         int i = array[fromRow][fromCol];
         array[fromRow][fromCol] = array[toRow][toCol];
@@ -204,7 +224,7 @@ public final class Board {
         }
         return s.toString();
     }
-
+    //check if total length is greater than 0
     private void checkRep() {
         assert tilesCopy.length > 0;
     }

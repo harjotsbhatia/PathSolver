@@ -9,6 +9,7 @@ import java.util.Stack;
 
 public class PathSolver {
 
+    //initial data storage
     public int arrSize = 3;
     String path = "";
     int nodesCount = 0;
@@ -16,6 +17,10 @@ public class PathSolver {
     int[] horizontalIdx = {1, 0, -1, 0};
     int[] verticalIdx = {0, -1, 0, 1};
 
+    //this funciton loops over a node
+    //find total paths this node can travel
+    //finds total effort of travel
+    //returns effort count
     public int findEffortOfNode(int[][] starterNodes, int[][] endingNodes) {
         int indexerNodes = 0;
         int totalNodes = starterNodes.length;
@@ -30,6 +35,7 @@ public class PathSolver {
         return indexerNodes;
     }
 
+    //this display all nodes
     public void displayNodes(int[][] nodesSet) {
         for (int iter1 = 0; iter1 < nodesSet.length; iter1++) {
             for (int iter2 = 0; iter2 < nodesSet.length; iter2++) {
@@ -38,11 +44,13 @@ public class PathSolver {
             System.out.println();
         }
     }
-
+    
+    //this check if a solution move is possible or not
     public boolean canMoveToNode(int nodePt1, int nodePt2) {
         return (nodePt1 >= 0 && nodePt1 < arrSize && nodePt2 >= 0 && nodePt2 < arrSize);
     }
 
+    //this path calcualtes and reutrn total node ways
     public void showNodeWay(PathNode root) {
         if (root == null) {
             return;
@@ -52,6 +60,9 @@ public class PathSolver {
         System.out.println();
     }
 
+    //this method gets a node paths,
+    //makes a list of path
+    //chooses the bets path and returns true if possible
     public boolean canGetNodeResult(int[][] nodesSet) {
         int indexerNodes = 0;
         List<Integer> array = new ArrayList<Integer>();
@@ -76,6 +87,12 @@ public class PathSolver {
         return indexerNodes % 2 == 0;
     }
 
+    //this method picks the starter node
+    //using that node, it moves to every other node
+    //makes a priority queue of their paths
+    //using that key, this method dequeues one item at a  time
+    //pushes that item to link list
+    //and returns a total list of paths
     public void solve(int[][] starterNodes, int[][] endingNodes, int nodePt1, int nodePt2) {
         PriorityQueue<PathNode> nodeIdxr = new PriorityQueue<PathNode>(1000, (a, b) -> (a.cost + a.level) - (b.cost + b.level));
         PathNode root = new PathNode(starterNodes, nodePt1, nodePt2, nodePt1, nodePt2, 0, null);
@@ -112,6 +129,8 @@ public class PathSolver {
     private SearchNode finalNode;
     private Stack<Board> boards;
 
+    //thsi is overloaded cosntrucotr
+    //this sets up initial empty board
     public PathSolver(Board initial) {
         if (initial!=null) {
             if (!initial.isSolvable()) {
@@ -166,6 +185,10 @@ public class PathSolver {
         return boards;
     }
 
+    //this is search node method
+    //it compares two nodes
+    //choose best one to move on
+    //moves with the selected node
     private class SearchNode implements Comparable<SearchNode> {
 
         private final int priority;
@@ -186,7 +209,14 @@ public class PathSolver {
 
     }
 
+    //main method
     public static void main(String[] args) {
+        
+        //this solution implmenets BFS and DFS on above functions
+        //it first checks if solution is possible with DFS
+        //if possible, it moves with DFS
+        //otherwise it checks with BFS and moves with that
+        //in both cases it displays path and cost
         String input = "123450678";
         int[][] starterNodes = new int[3][3];
         int[][] endingNodes = {{1, 2, 3}, {4, 5, 6}, {7, 8, 0}};
@@ -225,6 +255,9 @@ public class PathSolver {
         {0, 2, 6},
         {7, 5, 8}};
 
+        //this solutions is calling an A* algorithm
+        //the function solve here is impleneting A*
+        //it returns the total ndoes, and the time taken
         double start = System.currentTimeMillis();
         Board board = new Board(tiles);
         PathSolver solve = new PathSolver(board);
