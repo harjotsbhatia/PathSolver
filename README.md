@@ -1,4 +1,4 @@
-n this assignment you will explore State-Space Search with the 8-Puzzle and 15-Puzzle.  You will need to implement and provide code for the following algorithms:
+In this assignment I explore State-Space Search with the 8-Puzzle and 15-Puzzle.  I implement and provide code for the following algorithms:
 
 Breadth-First Search
 Depth-First Search
