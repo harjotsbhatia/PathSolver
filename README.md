@@ -15,10 +15,10 @@ In addition, develop code to test a solution with requirements:
 Input initial puzzle state as string.
 Input move sequence as string.
 Produce output state from applying move sequence to initial state.
-Provide link to Github repository with all code, and submit final report as PDF with requirements:
 
-Provide overview of your code.
-Provide results for the following problems:
+
+
+Following problems were tested:
 "160273485" 
 "462301587" 
 "821574360" 
